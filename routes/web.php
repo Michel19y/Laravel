@@ -67,9 +67,9 @@ Route::get("/endereco/{id}/edit", [EnderecoController::class, 'edit'])->name('en
 Route::put("/endereco/{id}", [EnderecoController::class, 'update'])->name('endereco.update');
 Route::delete("/endereco/{id}", [EnderecoController::class, 'destroy'])->name("endereco.destroy");
 
-// Rotas De Pedidos
-Route::get("/pedidos", [PedidosController::class, 'index'])->name('pedidos.index');
-
+// Rotas de Pedidos
+Route::get('/pedidos', [PedidosController::class, 'index'])->name('pedidos.index');
+Route::post('/pedidos', [PedidosController::class, 'store'])->name('pedidos.store');  // Nome diferente para a rota POST
 
 
 

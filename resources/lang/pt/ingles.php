@@ -16,4 +16,5 @@ return [
     'search' => 'Pesquisar',
     'You are logged in!'=> 'Você esta logado nego',
     'Logout' => 'quer sair?',
+    
 ];
