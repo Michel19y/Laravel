@@ -15,14 +15,14 @@ class EnderecoController extends Controller
     public function index()
     {
         try {
-            $message = Session::get("message"); // Essa variável existirá quando o método for chamado por redirect com with
-            $enderecos = DB::select('SELECT * FROM Enderecos');
+            $message = Session::get("message"); // Obtém a mensagem da sessão, se existir
+            $enderecos = DB::select('SELECT * FROM Enderecos'); // Consulta SQL para obter endereços
             return view("Endereco/index")->with("enderecos", $enderecos)->with("message", $message);
         } catch (\Throwable $th) {
             return view("Endereco/index")->with("enderecos", [])->with("message", [$th->getMessage(), "danger"]);
         }
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */

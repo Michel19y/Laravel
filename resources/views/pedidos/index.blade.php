@@ -27,6 +27,10 @@
                                 <input type="text" class="form-control" disabled value="{{ $pedido->produtos_nome ?? 'Nenhum produto encontrado' }}">
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Observações</label>
+                                <input type="text" class="form-control" disabled value="{{ $pedido->observacoes ?? 'Nenhuma observção encontrado' }}">
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Status:</label>
                                 <input type="text" class="form-control" disabled value="{{ $pedido->status }}">
                             </div>
