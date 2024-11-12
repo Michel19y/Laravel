@@ -11,10 +11,21 @@ class Pedido extends Model
 
     protected $fillable = ['Users_id', 'Enderecos_id', 'status'];
 
-    public function produtos()
-    {
-        return $this->hasMany(PedidoProduto::class, 'Pedidos_id');
-    }
+    // Em App\Models\Pedido.php
+// Em App\Models\Pedido.php
+public function produtos()
+{
+    return $this->belongsToMany(Produto::class, 'pedido_produtos', 'Pedidos_id', 'Produtos_id')
+                ->withPivot('quantidade', 'observacao');
+}
+
+
+    // Em App\Models\Pedido.php
+public function endereco()
+{
+    return $this->belongsTo(Endereco::class, 'Enderecos_id');
+}
+
 }
 
 

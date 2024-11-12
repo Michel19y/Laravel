@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" type="image" href="/img/p.png">
 
     <!-- Google Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -26,6 +27,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+
 </head>
 
 
@@ -54,71 +56,80 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
-
                     </ul>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">Login</a>
-                                </li>
-                            @endif
+                  <!-- Right Side Of Navbar -->
+<ul class="navbar-nav ms-auto">
+    <!-- Authentication Links -->
+    @guest
+        @if (Route::has('login'))
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('login') }}">Login</a>
+            </li>
+        @endif
+        
+        @if (Route::has('register'))
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('register') }}">Register</a>
+            </li>
+        @endif
+    @endguest
+    
+    @if(Auth::guard('admin')->check())
+        <li class="nav-item dropdown">
+            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                {{ Auth::guard('admin')->user()->name }}
+            </a>
 
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">Register</a>
-                                </li>
-                            @endif
-                        @endguest
-                        @if(Auth::guard('web')->check())
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::guard('web')->user()->name }}
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('home') }}">
-                                        Home
-                                    </a>
-                                    <a class="dropdown-item" href="{{ route('user.logout') }}"
-                                        onclick="event.preventDefault();
-                                                    document.getElementById('user-logout-form').submit();">
-                                        Logout
-                                    </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                   Dashboard
+                </a>
+                <a class="dropdown-item" href="{{ route('admin.logout') }}"
+                    onclick="event.preventDefault();
+                                document.getElementById('admin-logout-form').submit();">
+                    sair
+                </a>
+                <a class="dropdown-item" href="{{ route('login') }}">
+                    Login como Usuário
+                </a> <!-- Link para logar como usuário -->
 
-                                    <form id="user-logout-form" action="{{ route('user.logout') }}" method="POST"
-                                            style="display: none;">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endif
-                        @if(Auth::guard('admin')->check())
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::guard('admin')->user()->name }}
-                                </a>
+                <form id="admin-logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </div>
+        </li>
+    @else
+        @if (Route::has('admin.login'))
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.login') }}">Login do admin</a>
+            </li>
+        @endif
+    @endif
 
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
-                                        Home
-                                    </a>
-                                    <a class="dropdown-item" href="{{ route('admin.logout') }}"
-                                        onclick="event.preventDefault();
-                                                    document.getElementById('admin-logout-form').submit();">
-                                        Logout
-                                    </a>
+    @if(Auth::guard('web')->check())
+        <li class="nav-item dropdown">
+            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                {{ Auth::guard('web')->user()->name }}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{ route('home') }}">
+                  Principal
+                </a>
+                <a class="dropdown-item" href="{{ route('user.logout') }}"
+                    onclick="event.preventDefault();
+                                document.getElementById('user-logout-form').submit();">
+                   sair
+                </a>
 
-                                    <form id="admin-logout-form" action="{{ route('admin.logout') }}" method="POST"
-                                            style="display: none;">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endif
-                    </ul>
+                <form id="user-logout-form" action="{{ route('user.logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </div>
+        </li>
+    @endif
+</ul>
+
                 </div>
             </div>
         </nav>

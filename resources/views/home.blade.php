@@ -3,7 +3,31 @@
 <!-- Link para CSS e ícone -->
 <link rel="stylesheet" href="{{ asset('css/index.css') }}">
 <link rel="icon" type="image" href="/img/p.png">
+<style>
+    .card-title {
+    margin-bottom: var(--bs-card-title-spacer-y);
+    color: black
+}
+.cor{
+    color: black;
+}
+.img-product {
+    width: 100%; /* A largura da imagem ocupará 100% da largura do cartão */
+    height: auto; /* Mantém a proporção original da imagem */
+    max-width: 200px; /* Define um valor máximo para não esticar demais em telas maiores */
+    margin: 0 auto; /* Centraliza a imagem dentro do cartão */
+}
 
+/* Adicione um ajuste para tamanhos de tela menores */
+@media (max-width: 868px) {
+    .card {
+        margin-bottom: 20px; /* Espaço entre os cartões em telas menores */
+    }
+}
+
+
+
+</style>
 @section('content')
 
     <!-- Mensagem de login -->
@@ -50,8 +74,9 @@
                                     <div class="card">
                                         <div class="card-body text-center">
                                             <h5 class="card-title">{{ $item->nome }}</h5>
-                                            <p>Preço: <strong>R$ {{ number_format($item->preco, 2, ',', '.') }}</strong></p>
-                                            <p>{{ $item->descricao }}</p>
+                                            <p class="cor
+                                            ">Preço: <strong>R$ {{ number_format($item->preco, 2, ',', '.') }}</strong></p>
+                                            <p class="cor">{{ $item->descricao }}</p>
                                             <img src="{{ $item->urlImage }}" alt="Foto do Produto" class="img-product">
 
                                             <!-- Campo para selecionar a quantidade -->
@@ -62,7 +87,7 @@
                                                         onclick="changeQuantity({{ $item->id }}, -1)">-</button>
                                                     <input type="number" id="quantidade-{{ $item->id }}"
                                                         name="produtos[{{ $item->id }}][quantidade]" min="0"
-                                                        value="0" class="form-control text-center" required readonly>
+                                                        value="0" class="form-control text-center" required>
                                                     <button type="button" class="btn btn-outline-secondary"
                                                         onclick="changeQuantity({{ $item->id }}, 1)">+</button>
                                                 </div>
@@ -81,7 +106,7 @@
                                 </div>
                             @endforeach
                         @else
-                            <p>Nenhum produto disponível.</p>
+                             <p class="cor">Nenhum produto disponível.</p>
                         @endif
                     </div>
 
@@ -97,63 +122,25 @@
                                     </option>
                                 @endforeach
                             @else
-                                <option value="">Nenhum endereço disponível</option>
+                                <option value="">Nenhum endereço disponível.</option>
                             @endif
                         </select>
                     </div>
 
-                    <!-- Botão para gerar o pedido -->
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-vibrant">Gerar Pedido</button>
-                    </div>
+                    <!-- Botão de enviar -->
+                    <button type="submit" class="btn btn-success mt-3">Fazer Pedido</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Script para modificar quantidade -->
-    <script>
-        function changeQuantity(productId, change) {
-            var quantityInput = document.getElementById('quantidade-' + productId);
-            var currentQuantity = parseInt(quantityInput.value);
-
-            // Atualiza a quantidade com base no botão pressionado
-            var newQuantity = currentQuantity + change;
-
-            // Garante que a quantidade não seja menor que 0
-            if (newQuantity < 0) {
-                newQuantity = 0;
-                alert("A quantidade não pode ser menor que 0."); // Feedback visual
-            }
-
-            // Atualiza o valor do input
-            quantityInput.value = newQuantity;
-        }
-    </script>
-
-    <!-- Mensagem de status com fade-out -->
-    <script>
-        window.onload = function() {
-            const alertBox = document.querySelector('.mens');
-
-            if (alertBox) {
-                // Esconde a mensagem após 2 segundos
-                setTimeout(() => {
-                    alertBox.style.transition = "opacity 0.5s ease"; // Transição suave
-                    alertBox.style.opacity = 0; // Faz a mensagem ficar invisível
-
-                    // Após a transição, remove o elemento do DOM
-                    setTimeout(() => {
-                        alertBox.remove();
-                    }, 500); // Aguarda a transição antes de remover
-                }, 2000);
-            }
-        };
-    </script>
-
-    <!-- Rodapé -->
-    <footer class="text-center mt-4">
-        <p>&copy; 2024 Pizzaria do Caronte. Todos os direitos reservados. Ouse cruzar o rio.</p>
-    </footer>
-
 @endsection
+
+<script>
+    function changeQuantity(id, delta) {
+        let input = document.getElementById('quantidade-' + id);
+        let quantity = parseInt(input.value) || 0; // Obtém o valor atual ou 0
+        quantity += delta; // Adiciona ou subtrai
+        input.value = quantity < 0 ? 0 : quantity; // Garante que a quantidade não fique negativa
+    }
+</script>

@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserInfoController;
 use App\Http\Controllers\UserController;
@@ -8,29 +7,10 @@ use App\Http\Controllers\TipoProdutoController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\EnderecoController;
 use App\Http\Controllers\PedidosController;
-use App\Models\Produto;
-
-use function Ramsey\Uuid\v1;
-
-/*
-|---------------------------------------------------------------------------
-| Web Routes
-|---------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-// Rota para "php artisan serve"
-// Route::get('/', function () {
-// $produtos = Produto::all();
-//     return view('home')->with("produtos", $produtos);
-// })->name('home');
+use Illuminate\Support\Facades\Auth;
 
 // Rota para a página inicial
-Route::get('/', [HomeController::class, 'produtoHome'])->name('welcome');
+Route::get('/', [HomeController::class, 'produtoHome'])->middleware('auth')->name('welcome');
 Route::get('/home', [HomeController::class, 'produtoHome'])->name('home');
 
 // Rotas do usuário
@@ -67,20 +47,16 @@ Route::get("/endereco/{id}/edit", [EnderecoController::class, 'edit'])->name('en
 Route::put("/endereco/{id}", [EnderecoController::class, 'update'])->name('endereco.update');
 Route::delete("/endereco/{id}", [EnderecoController::class, 'destroy'])->name("endereco.destroy");
 
-// Rotas de Pedidos
-Route::get('/pedidos', [PedidosController::class, 'index'])->name('pedidos.index');
-Route::post('/pedidos', [PedidosController::class, 'store'])->name('pedidos.store');  // Nome diferente para a rota POST
-
-
-
+// Rotas Do Pedidos
+    Route::middleware(['auth'])->group(function () {
+    Route::get('/pedidos', [PedidosController::class, 'index'])->name('pedidos.index');
+    Route::post('/pedidos', [PedidosController::class, 'store'])->name('pedidos.store');
+    Route::get('/pedidos/{id}/edit', [PedidosController::class, 'edit'])->name('pedidos.edit');
+    Route::put('/pedidos/{id}', [PedidosController::class, 'update'])->name('pedidos.update');
+    Route::delete('/pedidos/{id}', [PedidosController::class, 'destroy'])->name('pedidos.destroy');
+});
 
 // Autenticação
-
-
-
-
-
-
 Route::post('/user/logout', 'App\Http\Controllers\Auth\LoginController@userLogout')->name('user.logout');
 Auth::routes();
 
@@ -95,18 +71,9 @@ Route::prefix('admin')->group(function () {
     // Logout route
     Route::post('/logout', 'App\Http\Controllers\Auth\AdminLoginController@logout')->name('admin.logout');
 
-    // Register routes
-    // Route::get('/register', 'App\Http\Controllers\Auth\AdminRegisterController@showRegistrationForm')->name('admin.register');
-    // Route::post('/register', 'App\Http\Controllers\Auth\AdminRegisterController@register')->name('admin.register.submit');
-
     // Password reset routes
     Route::get('/password/reset', 'App\Http\Controllers\Auth\AdminForgotPasswordController@showLinkRequestForm')->name('admin.password.request');
     Route::post('/password/email', 'App\Http\Controllers\Auth\AdminForgotPasswordController@sendResetLinkEmail')->name('admin.password.email');
     Route::get('/password/reset/{token}', 'App\Http\Controllers\Auth\AdminResetPasswordController@showResetForm')->name('admin.password.reset');
     Route::post('/password/reset', 'App\Http\Controllers\Auth\AdminResetPasswordController@reset')->name('admin.password.update');
-});
-
-// Rota para a página inicial novamente (redundante, pode ser removida)
-Route::get('/inicio', function () {
-    return view('inicio.welcome');
 });
