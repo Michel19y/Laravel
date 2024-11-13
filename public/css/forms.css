@@ -67,7 +67,7 @@ transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     color: rgb(255 255 255 / 75%) !important;
 }
 label {
-    color: #ffc107;
+    color: #555145;
     font-weight: bold;
 }
 .btn-vibrant {

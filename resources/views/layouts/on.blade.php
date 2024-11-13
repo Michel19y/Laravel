@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Caronte</title>
     <link rel="icon" type="image" href="/img/p.png">
 
     <!-- Google Fonts -->
@@ -32,6 +33,32 @@
 
 
 <style>
+    .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: var(--bs-dropdown-item-padding-y) var(--bs-dropdown-item-padding-x);
+    clear: both;
+    font-weight: 400;
+    color: #161616;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+.dropdown-item:hover {
+    display: block;
+    width: 100%;
+    padding: var(--bs-dropdown-item-padding-y) var(--bs-dropdown-item-padding-x);
+    clear: both;
+    font-weight: 400;
+    color: #4c2f2f;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: #c8c4c4b9;
+    border: 0;
+}
     .btn-botoes {
         border: 1px solid #e0e0e0;
         border-radius: 5px;
@@ -47,7 +74,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                    Caronte
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -64,13 +91,13 @@
     @guest
         @if (Route::has('login'))
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('login') }}">Login</a>
+                <a class="nav-link" href="{{ route('login') }}">Login  </a>
             </li>
         @endif
         
         @if (Route::has('register'))
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('register') }}">Register</a>
+                <a class="nav-link" href="{{ route('register') }}">Register </a>
             </li>
         @endif
     @endguest
@@ -90,9 +117,7 @@
                                 document.getElementById('admin-logout-form').submit();">
                     sair
                 </a>
-                <a class="dropdown-item" href="{{ route('login') }}">
-                    Login como Usuário
-                </a> <!-- Link para logar como usuário -->
+              
 
                 <form id="admin-logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
                     @csrf
@@ -116,6 +141,9 @@
                 <a class="dropdown-item" href="{{ route('home') }}">
                   Principal
                 </a>
+                <a class="dropdown-item" href="{{ route('userinfo.index') }}">
+                    Minha conta
+                  </a>
                 <a class="dropdown-item" href="{{ route('user.logout') }}"
                     onclick="event.preventDefault();
                                 document.getElementById('user-logout-form').submit();">

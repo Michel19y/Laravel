@@ -1,12 +1,33 @@
 
     @extends('layouts.on')
 @section('content')
+<style> 
+
+    h1{
+        color:black;
+    }
+    h1:hover{
+        color:rgb(0, 0, 0);
+    }
+    .col-md-6{
+        color: black;
+    }
+    .text-md-end {
+        text-align: right !important;
+        color: #191919;
+    }
+    label {
+    color: #000000;
+    font-weight: bold;
+}
+
+</style>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card"> 
                 <div class="card-header">{{ __('Login') }}</div>
-<h1> Login para usuário </h1>
+<h1> Login Usuario </h1>
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
                         @csrf

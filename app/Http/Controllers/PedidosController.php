@@ -9,12 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Support\Facades\DB;
-
+  use Illuminate\Support\Collection;
+    
 class PedidosController extends Controller
 {
+   
     public function index()
     {
-        
         // Verifica se o usuário está autenticado
         if (!Auth::check()) {
             return redirect()->route('home')->with('error', 'Você precisa estar logado para ver seus pedidos.');
@@ -23,7 +24,7 @@ class PedidosController extends Controller
         // Obtém o usuário autenticado
         $user = Auth::user();
     
-        // Consulta SQL para obter os pedidos do usuário com seus produtos e o total calculado
+        // Consulta SQL para obter os pedidos do usuário com produtos e totais calculados
         $pedidos = DB::select("
             SELECT 
                 pedidos.id,
@@ -31,7 +32,8 @@ class PedidosController extends Controller
                 pedidos.created_at,
                 GROUP_CONCAT(pedido_produtos.quantidade SEPARATOR ', ') AS quantidade_total,
                 GROUP_CONCAT(produtos.nome SEPARATOR ', ') AS produtos_nome,
-                GROUP_CONCAT(pedido_produtos.observacao SEPARATOR ', ') AS observacoes, -- Adiciona a coluna observacao
+                GROUP_CONCAT(produtos.preco SEPARATOR ', ') AS produtos_preco,
+                GROUP_CONCAT(pedido_produtos.observacao SEPARATOR ', ') AS observacoes,
                 SUM(pedido_produtos.quantidade * produtos.preco) AS total_preco,
                 enderecos.logradouro,
                 enderecos.bairro,
@@ -54,15 +56,24 @@ class PedidosController extends Controller
             ORDER BY pedidos.id
         ", [$user->id]);
     
-        // Adiciona o total calculado para cada pedido
+        // Processa os pedidos para formatar os dados dos produtos como arrays
         $pedidos = collect($pedidos)->map(function ($pedido) {
-            $pedido->total = $pedido->total_preco; // Total calculado na consulta
+            // Transforma as strings concatenadas em arrays
+            $pedido->produtos = explode(', ', $pedido->produtos_nome);
+            $pedido->quantidades = explode(', ', $pedido->quantidade_total);
+            $pedido->precos = explode(', ', $pedido->produtos_preco);
+            $pedido->observacoes = explode(', ', $pedido->observacoes);
+    
+            // Adiciona o total calculado para cada pedido
+            $pedido->total = $pedido->total_preco;
+            
             return $pedido;
         });
     
         // Retorna a view com os pedidos do usuário
-        return view('pedidos.index')->with(['pedidos' => $pedidos]);
+        return view('pedidos.index', ['pedidos' => $pedidos]);
     }
+    
     
 
 

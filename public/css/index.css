@@ -111,3 +111,32 @@ label {
 .menu-item:hover {
     transform: scale(1.05); /* Efeito de hover */
 }
+p{
+    color: rgb(45, 39, 39);
+}
+.modal-title {
+color: #000000;
+margin-bottom: 0;
+line-height: var(--bs-modal-title-line-height);
+}
+li{
+    color: black;
+}
+.card-title {
+    margin-bottom: var(--bs-card-title-spacer-y);
+    color: black;
+}
+.cor {
+    color: black;
+}
+.img-product {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    margin: 0 auto;
+}
+@media (max-width: 868px) {
+    .card {
+        margin-bottom: 20px;
+    }
+}

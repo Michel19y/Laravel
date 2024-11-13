@@ -109,10 +109,13 @@
     }
 </style>
 
+
+
+
+
 @section('content')
 <div class="container mt-5">
     <h2 class="text-center mb-4">Meus Pedidos</h2>
-  @csrf
     <div class="row justify-content-center">
         @if(isset($pedidos) && count($pedidos) > 0)
             @foreach($pedidos as $pedido)
@@ -130,26 +133,38 @@
                                 <span class="fw-bold"><i class="fas fa-user me-2"></i>Cliente:</span>
                                 <span>{{ $pedido->cliente_nome ?? 'Nome não disponível' }}</span>
                             </div>
+
+                            <!-- Lista de Produtos -->
                             <div class="info-group mb-2">
                                 <span class="fw-bold"><i class="fas fa-box-open me-2"></i>Produtos:</span>
-                                <span>{{ $pedido->produtos_nome ?? 'Nenhum produto encontrado' }}</span>
+                                <ul>
+                                    @foreach($pedido->produtos as $index => $produto)
+                                        <li>
+                                            <strong>{{ $produto }}</strong><br>
+                                            Quantidade: {{ $pedido->quantidades[$index] }}<br>
+                                            Preço Individual: R$ {{ number_format($pedido->precos[$index], 2, ',', '.') }}<br>
+                                            Observação: {{ $pedido->observacoes[$index] ?? 'Nenhuma observação' }}<br>
+                                            Subtotal: R$ {{ number_format($pedido->precos[$index] * $pedido->quantidades[$index], 2, ',', '.') }}
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            <div class="info-group mb-2">
-                                <span class="fw-bold"><i class="fas fa-sticky-note me-2"></i>Observações:</span>
-                                <span>{{ $pedido->observacoes ?? 'Nenhuma observação encontrada' }}</span>
-                            </div>
+
                             <div class="info-group mb-2">
                                 <span class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Entrega:</span>
-                                <span>{{ $pedido->bairro ?? '' }}, {{ $pedido->logradouro ?? 'Endereço não disponível' }} {{ $pedido->numero ?? '' }}</span>
+                                <span>Bairro: {{ $pedido->bairro ?? '' }}, Logradouro: {{ $pedido->logradouro ?? 'Endereço não disponível' }}, Numero:{{ $pedido->numero ?? '' }}</span>
                             </div>
+                            
                             <div class="info-group mb-2">
-                                <span class="fw-bold"><i class="fas fa-cubes me-2"></i>Quantidades:</span>
-                                <span>{{ $pedido->quantidade_total ? $pedido->quantidade_total . ' unidades: ' . $pedido->produtos_nome : 'Nenhum produto encontrado' }}</span>
+                                <span class="fw-bold"><i class="fas fa-cubes me-2"></i>Total de Itens:</span>
+                                <span>{{ array_sum($pedido->quantidades) }} unidades</span>
                             </div>
+
                             <div class="info-group mb-2">
                                 <span class="fw-bold"><i class="fas fa-dollar-sign me-2"></i>Total:</span>
-                                <span>R$ {{ number_format($pedido->total_preco, 2, ',', '.') }}</span>
+                                <span>R$ {{ number_format($pedido->total, 2, ',', '.') }}</span>
                             </div>
+
                             <div class="info-group mb-3">
                                 <span class="fw-bold"><i class="fas fa-info-circle me-2"></i>Status:</span>
                                 <span>{{ $pedido->status }}</span>
@@ -160,9 +175,9 @@
                                     <i class="fas fa-edit me-1"></i>Editar Pedido
                                 </a>
                                 <a href="#" class="btn btn-danger btnRemover" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal" value="{{ route('pedidos.destroy', $pedido->id) }}">
-                                 Remover
-                             </a>
+                                   data-bs-target="#deleteModal" value="{{ route('pedidos.destroy', $pedido->id) }}">
+                                   Remover
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -182,6 +197,45 @@
     </div>
 </div>
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -215,5 +269,3 @@
         formModalBotaoRemover.setAttribute("action", this.getAttribute("value"));
     }
 </script>
-</div>
-

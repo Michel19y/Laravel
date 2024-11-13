@@ -1,6 +1,32 @@
 @extends('layouts.on')
 
 @section('content')
+<style> 
+
+    h1{
+        color:black;
+    }
+    h1:hover{
+        color:rgb(0, 0, 0);
+    }
+    .col-md-6{
+        color: black;
+    }
+    .text-md-end {
+        text-align: right !important;
+        color: #191919;
+    }
+    label {
+    color: #000000;
+    font-weight: bold;
+}
+    .card-header{
+        text-align: center;
+        font-size: 33px;
+        color: #000000;
+        background-color: white;
+    }
+</style>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
