@@ -16,45 +16,85 @@ class PedidosController extends Controller
    
     public function index()
     {
-        // Verifica se o usuário está autenticado
-        if (!Auth::check()) {
+        // Verifica se o usuário está autenticado no guard de admin ou de usuário
+        if (!Auth::guard('admin')->check() && !Auth::check()) {
             return redirect()->route('home')->with('error', 'Você precisa estar logado para ver seus pedidos.');
         }
     
-        // Obtém o usuário autenticado
-        $user = Auth::user();
+        // Verifica se o usuário está autenticado como admin
+        $isAdmin = Auth::guard('admin')->check();
     
-        // Consulta SQL para obter os pedidos do usuário com produtos e totais calculados
-        $pedidos = DB::select("
-            SELECT 
-                pedidos.id,
-                pedidos.status,
-                pedidos.created_at,
-                GROUP_CONCAT(pedido_produtos.quantidade SEPARATOR ', ') AS quantidade_total,
-                GROUP_CONCAT(produtos.nome SEPARATOR ', ') AS produtos_nome,
-                GROUP_CONCAT(produtos.preco SEPARATOR ', ') AS produtos_preco,
-                GROUP_CONCAT(pedido_produtos.observacao SEPARATOR ', ') AS observacoes,
-                SUM(pedido_produtos.quantidade * produtos.preco) AS total_preco,
-                enderecos.logradouro,
-                enderecos.bairro,
-                enderecos.numero,
-                users.name AS cliente_nome
-            FROM pedidos
-            JOIN pedido_produtos ON pedidos.id = pedido_produtos.Pedidos_id
-            JOIN produtos ON pedido_produtos.Produtos_id = produtos.id
-            JOIN enderecos ON pedidos.Enderecos_id = enderecos.id
-            JOIN users ON pedidos.Users_id = users.id
-            WHERE pedidos.Users_id = ?
-            GROUP BY 
-                pedidos.id, 
-                pedidos.status, 
-                pedidos.created_at, 
-                enderecos.logradouro, 
-                enderecos.bairro, 
-                enderecos.numero, 
-                users.name
-            ORDER BY pedidos.id
-        ", [$user->id]);
+        // Obtém o ID do usuário autenticado (se for admin, usa o guard admin; se não, usa o usuário comum)
+        $userId = $isAdmin ? Auth::guard('admin')->user()->id : Auth::user()->id;
+    
+        // Define a consulta SQL com base no tipo de usuário
+        $pedidos = [];
+    
+        if ($isAdmin) {
+            // Se o usuário é admin, busca todos os pedidos
+            $pedidos = DB::select("
+                SELECT 
+                    pedidos.id,
+                    pedidos.status,
+                    pedidos.created_at,
+                    GROUP_CONCAT(pedido_produtos.quantidade SEPARATOR ', ') AS quantidade_total,
+                    GROUP_CONCAT(produtos.nome SEPARATOR ', ') AS produtos_nome,
+                    GROUP_CONCAT(produtos.preco SEPARATOR ', ') AS produtos_preco,
+                    GROUP_CONCAT(pedido_produtos.observacao SEPARATOR ', ') AS observacoes,
+                    SUM(pedido_produtos.quantidade * produtos.preco) AS total_preco,
+                    enderecos.logradouro,
+                    enderecos.bairro,
+                    enderecos.numero,
+                    users.name AS cliente_nome
+                FROM pedidos
+                JOIN pedido_produtos ON pedidos.id = pedido_produtos.Pedidos_id
+                JOIN produtos ON pedido_produtos.Produtos_id = produtos.id
+                LEFT JOIN enderecos ON pedidos.Enderecos_id = enderecos.id
+                JOIN users ON pedidos.Users_id = users.id
+                GROUP BY 
+                    pedidos.id, 
+                    pedidos.status, 
+                    pedidos.created_at, 
+                    enderecos.logradouro, 
+                    enderecos.bairro, 
+                    enderecos.numero, 
+                    users.name
+                ORDER BY pedidos.id
+            ");
+        } 
+        else {
+            // Caso contrário, busca apenas os pedidos do usuário autenticado
+            $pedidos = DB::select("
+                SELECT 
+                    pedidos.id,
+                    pedidos.status,
+                    pedidos.created_at,
+                    GROUP_CONCAT(pedido_produtos.quantidade SEPARATOR ', ') AS quantidade_total,
+                    GROUP_CONCAT(produtos.nome SEPARATOR ', ') AS produtos_nome,
+                    GROUP_CONCAT(produtos.preco SEPARATOR ', ') AS produtos_preco,
+                    GROUP_CONCAT(pedido_produtos.observacao SEPARATOR ', ') AS observacoes,
+                    SUM(pedido_produtos.quantidade * produtos.preco) AS total_preco,
+                    enderecos.logradouro,
+                    enderecos.bairro,
+                    enderecos.numero,
+                    users.name AS cliente_nome
+                FROM pedidos
+                JOIN pedido_produtos ON pedidos.id = pedido_produtos.Pedidos_id
+                JOIN produtos ON pedido_produtos.Produtos_id = produtos.id
+                LEFT JOIN enderecos ON pedidos.Enderecos_id = enderecos.id
+                JOIN users ON pedidos.Users_id = users.id
+                WHERE pedidos.Users_id = ?
+                GROUP BY 
+                    pedidos.id, 
+                    pedidos.status, 
+                    pedidos.created_at, 
+                    enderecos.logradouro, 
+                    enderecos.bairro, 
+                    enderecos.numero, 
+                    users.name
+                ORDER BY pedidos.id
+            ", [$userId]);
+        }
     
         // Processa os pedidos para formatar os dados dos produtos como arrays
         $pedidos = collect($pedidos)->map(function ($pedido) {
@@ -64,16 +104,32 @@ class PedidosController extends Controller
             $pedido->precos = explode(', ', $pedido->produtos_preco);
             $pedido->observacoes = explode(', ', $pedido->observacoes);
     
+            // Substitui o endereço por "Buscar na Pizzaria" se os valores forem null
+            if (is_null($pedido->logradouro) && is_null($pedido->bairro) && is_null($pedido->numero)) {
+                $pedido->endereco = "Buscar na Pizzaria";
+            } else {
+                $pedido->endereco = "{$pedido->logradouro}, {$pedido->numero} - {$pedido->bairro}";
+            }
+    
             // Adiciona o total calculado para cada pedido
             $pedido->total = $pedido->total_preco;
             
             return $pedido;
         });
     
-        // Retorna a view com os pedidos do usuário
+        // Retorna a view com os pedidos
         return view('pedidos.index', ['pedidos' => $pedidos]);
     }
     
+
+
+
+
+
+
+
+
+
     
 
 
@@ -154,7 +210,7 @@ class PedidosController extends Controller
 
     public function edit($id)
     {
-        if (!Auth::guard('admin')->check()) {
+        if (!Auth::guard('web')->check()) {
             return redirect()->route('home')->with('error', 'Acesso negado.');
         }
     
@@ -207,7 +263,7 @@ class PedidosController extends Controller
     {
     DB::beginTransaction(); // Inicia a transação
     try {
-    $produto = Pedido::find($id);
+    $pedido = Pedido::find($id);
     if (isset($pedido)) {
     $pedido->delete();
    

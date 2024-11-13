@@ -144,6 +144,9 @@
                 <a class="dropdown-item" href="{{ route('userinfo.index') }}">
                     Minha conta
                   </a>
+                  <a class="dropdown-item" href="{{ route('pedidos.index') }}">
+                    Meus Pedidos
+                  </a>
                 <a class="dropdown-item" href="{{ route('user.logout') }}"
                     onclick="event.preventDefault();
                                 document.getElementById('user-logout-form').submit();">

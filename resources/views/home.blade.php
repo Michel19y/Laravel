@@ -20,7 +20,7 @@
                             </div>
                         @endif
                         <h3 class="text-success">{{ __('ingles.You are logged in!') }}</h3>
-                        <p>Pronto para explorar nosso cardápio do submundo?</p>
+                        <p class="sub">Pronto para explorar nosso cardápio do submundo?</p>
                     @endif
                 </div>
             </div>
@@ -32,7 +32,7 @@
 <div class="hero-section text-center">
     <div class="hero-text">
         <h1>Bem-vindo à Pizzaria do Caronte</h1>
-        <p>Onde cada mordida é uma jornada ao submundo.</p>
+        <p class="sub">Onde cada mordida é uma jornada ao submundo.</p>
     </div>
 </div>
 
@@ -80,17 +80,20 @@
                 <div class="form-group mt-4">
                     <label for="enderecos">Escolha o endereço:</label>
                     <select id="enderecos" name="Enderecos_id" class="form-control" required>
-                        <option value="">Selecione um endereço</option>
+                        <option value="">Buscar na Pizzaria</option>
                         @if (isset($enderecos) && count($enderecos) > 0)
                             @foreach ($enderecos as $endereco)
                                 <option value="{{ $endereco->id }}">{{ $endereco->logradouro }}, {{ $endereco->numero }} - {{ $endereco->bairro }}</option>
                             @endforeach
                         @else
-                            <option value="">Nenhum endereço disponível.</option>
+                   
+                           </option>
                         @endif
-                    </select>
+                     
+                    </select>   
+                    
                 </div>
-
+<a class="btn btn-primary mt-3" href="{{route("endereco.create")}}">Cadastrar Endereço</a>
                 <button type="button" onclick="confirmarPedido()" class="btn btn-success mt-3">Fazer Pedido</button>
             </form>
         </div>
@@ -121,7 +124,13 @@
     </div>
 </div>
 
-@endsection
+
+
+
+
+
+
+
 
 <script>
 function changeQuantity(id, delta) {
@@ -167,3 +176,4 @@ setTimeout(function() {
     }
 }, 2000);
 </script>
+@endsection

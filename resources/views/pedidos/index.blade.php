@@ -10,19 +10,23 @@
     .container {
         max-width: 1200px;
     }
-    .card-header{
+
+    .card-header {
         background-color: #28a745;
     }
-#exampleModalLabel{
-    color: #333
-}
+
+    #exampleModalLabel {
+        color: #333;
+    }
+
     /* Estilo para o Título */
     h2.text-center {
         color: #28a745;
         font-weight: bold;
     }
-    .modal-body{
-        color: #333
+
+    .modal-body {
+        color: #333;
     }
 
     /* Cartão de Pedido */
@@ -109,10 +113,6 @@
     }
 </style>
 
-
-
-
-
 @section('content')
 <div class="container mt-5">
     <h2 class="text-center mb-4">Meus Pedidos</h2>
@@ -152,9 +152,12 @@
 
                             <div class="info-group mb-2">
                                 <span class="fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Entrega:</span>
-                                <span>Bairro: {{ $pedido->bairro ?? '' }}, Logradouro: {{ $pedido->logradouro ?? 'Endereço não disponível' }}, Numero:{{ $pedido->numero ?? '' }}</span>
+                                @if (empty($pedido->bairro) && empty($pedido->logradouro) && empty($pedido->numero))
+                                    <span>Buscar na pizzaria</span>
+                                @else
+                                    <span>Bairro: {{ $pedido->bairro ?? '' }}, Logradouro: {{ $pedido->logradouro ?? 'Endereço não disponível' }}, Número: {{ $pedido->numero ?? '' }}</span>
+                                @endif
                             </div>
-                            
                             <div class="info-group mb-2">
                                 <span class="fw-bold"><i class="fas fa-cubes me-2"></i>Total de Itens:</span>
                                 <span>{{ array_sum($pedido->quantidades) }} unidades</span>
@@ -175,7 +178,7 @@
                                     <i class="fas fa-edit me-1"></i>Editar Pedido
                                 </a>
                                 <a href="#" class="btn btn-danger btnRemover" data-bs-toggle="modal"
-                                   data-bs-target="#deleteModal" value="{{ route('pedidos.destroy', $pedido->id) }}">
+                                   data-bs-target="#deleteModal" data-action="{{ route('pedidos.destroy', $pedido->id) }}">
                                    Remover
                                 </a>
                             </div>
@@ -196,47 +199,8 @@
         </a>
     </div>
 </div>
-@endsection
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Modal -->
+<!-- Modal de Confirmação para Remoção -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -245,10 +209,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Deseja realmente remover este recurso?
+                Deseja realmente remover este pedido?
             </div>
             <div class="modal-footer">
-                <form id="id-form-modal-botao-remover" method="post" action="">
+                <form id="deleteForm" method="post" action="">
                     @csrf
                     @method('delete')
                     <button type="submit" class="btn btn-danger">Confirmar</button>
@@ -259,13 +223,15 @@
 </div>
 
 <script>
-    let arrayBotaoRemover = document.querySelectorAll(".btnRemover");
-    let formModalBotaoRemover = document.querySelector("#id-form-modal-botao-remover");
-    arrayBotaoRemover.forEach(element => {
-        element.addEventListener('click', configuraBotaoRemoverModal);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleciona todos os botões de remoção e adiciona evento para configurar o formulário do modal
+        document.querySelectorAll('.btnRemover').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const action = button.getAttribute('data-action');
+                document.getElementById('deleteForm').setAttribute('action', action);
+            });
+        });
     });
-
-    function configuraBotaoRemoverModal() {
-        formModalBotaoRemover.setAttribute("action", this.getAttribute("value"));
-    }
 </script>
+
+@endsection

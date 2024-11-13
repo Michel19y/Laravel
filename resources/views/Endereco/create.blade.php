@@ -43,7 +43,7 @@
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-primary">Enviar</button>
-                <a href="{{route("endereco.index")}}" class="btn btn-primary">Voltar</a>
+                <a href="{{url()->previous()}}" class="btn btn-primary">Voltar</a>
             </div>
         </form>
     </div>

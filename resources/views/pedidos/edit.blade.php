@@ -82,7 +82,9 @@
     <form action="{{ route('pedidos.update', $pedido->id) }}" method="POST">
         @csrf
         @method('PUT')
-
+        @if(Auth::guard('admin')->check())
+ 
+    
         <!-- Campo de seleção para o status do pedido -->
         <div class="mb-4">
             <label for="status" class="form-label">Status do Pedido <i class="fas fa-arrow-down me-2"></i>
@@ -92,7 +94,8 @@
                 <option value="a" {{ $pedido->status == 'a' ? 'selected' : '' }}>Aprovado</option>
                 <option value="c" {{ $pedido->status == 'c' ? 'selected' : '' }}>Cancelado</option>
             </select>
-        </div>
+        </div>      
+    @endif
 
         <!-- Loop para listar e editar os produtos do pedido -->
         @foreach ($pedido->produtos as $produto)
