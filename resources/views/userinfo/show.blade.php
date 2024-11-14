@@ -38,7 +38,7 @@
         </div>
 
         <div class="text-center mt-4">
-            <a href="{{ route('home') }}" class="btn btn-secondary">Voltar</a>
+            <a href="{{ route('userinfo.index') }}" class="btn btn-secondary">Voltar</a>
             <a href="{{ route('userinfo.edit', ['id' => Auth::user()->id]) }}" class="btn btn-secondary">Editar</a>
         </div>
     </div>

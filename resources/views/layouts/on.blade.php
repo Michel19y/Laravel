@@ -10,10 +10,8 @@
 
     <title>Caronte</title>
     <link rel="icon" type="image" href="/img/p.png">
-<!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
 
     <!-- Google Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -95,13 +93,13 @@
     @guest
         @if (Route::has('login'))
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('login') }}">Login  </a>
+                <a class="nav-link" href="{{ route('login') }}">Logar  </a>
             </li>
         @endif
         
         @if (Route::has('register'))
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('register') }}">Register </a>
+                <a class="nav-link" href="{{ route('register') }}">Crie sua conta </a>
             </li>
         @endif
     @endguest

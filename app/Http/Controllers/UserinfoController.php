@@ -20,24 +20,24 @@ class UserInfoController extends Controller
      */
     public function index()
     {
-        
         // Verifica se o usuário está autenticado
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Você precisa estar logado.');
         }
-
+    
         $user = Auth::user();
-
+    
         // Busca informações do usuário
         $userInfos = DB::table('users')
             ->select('users.*')  // Seleciona as colunas da tabela 'users'
             ->where('users.id', '=', $user->id)  // Aplica o filtro para o ID especificado
             ->first();  // Obtém o primeiro resultado
-
+    
+        // Se as informações do usuário não existirem, redireciona para 'userinfo.create'
         if (!$userInfos) {
-            return redirect()->back()->with('error', 'Informações do usuário não encontradas.');
+            return redirect()->route('userinfo.create')->with('error', 'Informações do usuário não encontradas.');
         }
-
+    
         // Retorna a view com as informações do usuário
         return view('userinfo.index')->with("userInfos", $userInfos);
     }
@@ -75,15 +75,17 @@ class UserInfoController extends Controller
         $userInfo->dataNasc = $request->dataNasc;
         $userInfo->genero = $request->genero;
     
-        // Se houver imagem, processa o upload
-        if ($request->hasFile('imagem')) {
-            $imagem = $request->file('imagem');
-            
-            // Controla o nome do arquivo que será salvo
-            $nomeImagem = Auth::user()->id . "-" . time() . ".{$imagem->getClientOriginalExtension()}";
-            $caminhoImagem = public_path("img/perfil");
+        // Verifica se foi enviado um arquivo de imagem
+        if ($request->hasFile('profileImg')) {
+            $imagem = $request->file('profileImg');
     
-            // Cria a pasta se não existir
+            // Cria um nome único para a imagem com base no ID do usuário e timestamp
+            $nomeImagem = Auth::user()->id . '-' . time() . '.' . $imagem->getClientOriginalExtension();
+    
+            // Define o caminho onde a imagem será guardada
+            $caminhoImagem = public_path('img/perfil');
+    
+            // Cria a pasta se ela não existir
             if (!file_exists($caminhoImagem)) {
                 mkdir($caminhoImagem, 0755, true);
             }
@@ -91,18 +93,20 @@ class UserInfoController extends Controller
             // Move a imagem para o diretório
             $imagem->move($caminhoImagem, $nomeImagem);
     
-            // Atualiza a URL da imagem no objeto userInfo
-            $userInfo->profileImg = "/img/perfil/$nomeImagem";
+            // Atualiza o campo profileImg no objeto userInfo com o caminho relativo da imagem
+            $userInfo->profileImg = "/img/perfil/" . $nomeImagem;
         } else {
-            // Caso não tenha imagem, define uma imagem padrão
-            $userInfo->profileImg = "/img/default.png"; // Caminho da imagem padrão
+            // Se não tiver imagem, define uma imagem padrão
+            $userInfo->profileImg = "/img/perfil/default.png"; // Caminho da imagem padrão
         }
     
-        // Salva o registro
+        // Salva o registro com as informações fornecidas
         $userInfo->save();
     
+        // Retorna para a página de informações com uma mensagem de sucesso
         return redirect()->route('userinfo.index')->with('success', 'Informações salvas com sucesso!');
     }
+    
     
     /**
      * Display the specified resource.

@@ -1,128 +1,176 @@
 @extends('layouts.on')
 
-<!-- Flatpickr CSS -->
+<!-- CSS do Flatpickr -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<style>   body {
-    background-color: #f8f9fa;
-    color: #333;
-}
+<!-- JavaScript do Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Tradução para Português -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
-.container {
-    max-width: 1200px;
-}
+<style>   
+    body {
+        background-color: #f8f9fa;
+        color: #333;
+    }
 
-.card-header {
-    background-color: #28a745;
-}
+    .container {
+        max-width: 1200px;
+    }
+/* Estilo para o botão "X" */
+.close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: #333;
+        cursor: pointer;
+    }
 
-h2.text-center {
-    color: #28a745;
-    font-weight: bold;
-}
-.modal-body{
-    color: black;
-}
-#exampleModalLabel{
-    color: black !important;
-}
-/* Corpo do Cartão */
-.card {
-    border: none;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.card-header {
-    background-color: #28a745 !important;
-    color: #fff;
-    font-weight: bold;
-    font-size: 1.1em;
-    text-align: center;
-}
-
-.card-body {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-.info-group {
-    margin-bottom: 1rem;
-    color: #333;
-}
-
-.info-group span.fw-bold {
-    color: #495057;
-}
-
-/* Campo de Exibição Desabilitado */
-.card-body .form-control[disabled] {
-    background-color: #e9ecef;
-    color: #495057;
-    border: none;
-    font-weight: 500;
-}
-
-/* Botão de Edição */
-.btn-primary {
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 20px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-/* Botão Voltar para o Menu */
-.btn-secondary {
-    color: #fff;
-    background-color: #6c757d;
-    border: none;
-    padding: 10px 20px;
-    margin-top: 20px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-secondary:hover {
-    background-color: #565e64;
-}
-
-/* Responsividade para Telas Menores */
-@media (max-width: 576px) {
     .card-header {
-        font-size: 1em;
+        background-color: #28a745;
     }
+
+    h2.text-center {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .modal-body {
+        color: black;
+    }
+    
+    #exampleModalLabel {
+        color: black !important;
+    }
+
+    /* Corpo do Cartão */
+    .card {
+        border: none;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background-color: #28a745 !important;
+        color: #fff;
+        font-weight: bold;
+        font-size: 1.1em;
+        text-align: center;
+    }
+
+    .card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
     .info-group {
-        font-size: 0.9em;
+        margin-bottom: 1rem;
+        color: #333;
     }
-} </style>
+
+    .info-group span.fw-bold {
+        color: #495057;
+    }
+
+    /* Estilo do ícone no campo de entrada */
+    .input-icon {
+        position: relative;
+    }
+
+    .input-icon input {
+        padding-left: 2.5rem;
+    }
+
+    .input-icon i {
+        position: absolute;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+        color: #28a745;
+    }
+
+    /* Botão de Edição */
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    /* Botão Voltar para o Menu */
+    .btn-secondary {
+        color: #fff;
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 20px;
+        margin-top: 20px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background-color: #565e64;
+    }
+    #mensagem{
+        color: #3597bb;
+    }
+
+    /* Responsividade para Telas Menores */
+    @media (max-width: 576px) {
+        .card-header {
+            font-size: 1em;
+        }
+        .info-group {
+            font-size: 0.9em;
+        }
+    }
+</style>
+
 @section('content')
 <div class="container mt-5">
+    <p id="mensagem" class="alert alert-info position-relative">
+        {{$message}}
+        <button type="button" class="close-btn" onclick="removerMensagem()">X</button>
+    </p>
+    @if (isset($erro))
+
+    
+    <p>{{$erro}}</p>
+        
+    @endif
+    
+
+
     <h2 class="text-center mb-4">Meus Pedidos</h2>
 
     <!-- Filtro de Data -->
     <form method="GET" action="{{ route('pedidos.index') }}" class="mb-4 d-flex justify-content-center">
-        <div class="form-group me-2">
-            <label for="data_inicio">Data Início</label>
-            <input type="text" name="data_inicio" id="data_inicio" class="form-control" value="{{ $dataInicio }}">
+        <div class="form-group input-icon me-2">
+            <i class="fas fa-calendar-alt"></i>
+            <input type="text" name="data_inicio" id="data_inicio" class="form-control" placeholder="Data Início" value="{{ request()->get('data_inicio', session('data_inicio')) }}">
         </div>
-        <div class="form-group me-2">
-            <label for="data_fim">Data Fim</label>
-            <input type="text" name="data_fim" id="data_fim" class="form-control" value="{{ $dataFim }}">
+        <div class="form-group input-icon me-2">
+            <i class="fas fa-calendar-alt"></i>
+            <input type="text" name="data_fim" id="data_fim" class="form-control" placeholder="Data Fim" value="{{ request()->get('data_fim', session('data_fim')) }}">
         </div>
         <button type="submit" class="btn btn-primary align-self-end"><i class="fas fa-filter me-1"></i>Filtrar</button>
     </form>
 
+    <!-- Lista de Pedidos -->
     <div class="row justify-content-center">
         @if(isset($pedidos) && count($pedidos) > 0)
             @foreach($pedidos as $pedido)
@@ -135,7 +183,6 @@ h2.text-center {
                             <div class="info-group mb-2">
                                 <span class="fw-bold"><i class="fas fa-calendar-alt me-2"></i>Data:</span>
                                 <span>{{ \Carbon\Carbon::parse($pedido->created_at)->format('d/m/Y') }} | Hora: {{ \Carbon\Carbon::parse($pedido->created_at)->format('H:i:s') }}</span>
-
                             </div>
                             <div class="info-group mb-2">
                                 <span class="fw-bold"><i class="fas fa-user me-2"></i>Cliente:</span>
@@ -181,8 +228,7 @@ h2.text-center {
                                 <a href="{{ route('pedidos.edit', $pedido->id) }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-edit me-1"></i>Editar Pedido
                                 </a>
-                                <a href="#" class="btn btn-danger btnRemover" data-bs-toggle="modal"
-                                   data-bs-target="#deleteModal" data-action="{{ route('pedidos.destroy', $pedido->id) }}">
+                                <a href="#" class="btn btn-danger btnRemover" data-bs-toggle="modal" data-bs-target="#deleteModal" data-action="{{ route('pedidos.destroy', $pedido->id) }}">
                                    <i class="fas fa-trash-alt me-1"></i>Remover
                                 </a>
                             </div>
@@ -226,24 +272,17 @@ h2.text-center {
     </div>
 </div>
 
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Script para inicializar o Flatpickr em português -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Configuração do Flatpickr para o filtro de data
-        flatpickr("#data_inicio", {
-            dateFormat: "d/m/Y", // Formato para o estilo 23/09/2024
-            locale: "pt",
+        // Configuração do Flatpickr para os campos de data
+        flatpickr("#data_inicio, #data_fim", {
+            dateFormat: "d/m/Y",
+            locale: flatpickr.l10ns.pt, // Definindo o idioma para português
             maxDate: new Date()
         });
 
-        flatpickr("#data_fim", {
-            dateFormat: "d/m/Y", // Formato para o estilo 23/09/2024
-            locale: "pt",
-            maxDate: new Date()
-        });
-
-        // Configura o formulário de remoção no modal
+        // Configuração do formulário de remoção no modal
         document.querySelectorAll('.btnRemover').forEach(function(button) {
             button.addEventListener('click', function() {
                 const action = button.getAttribute('data-action');
@@ -251,6 +290,15 @@ h2.text-center {
             });
         });
     });
+    function removerMensagem() {
+        const mensagemElement = document.getElementById('mensagem');
+        if (mensagemElement) {
+            mensagemElement.remove();
+        }
+    }
+
+    // Remover a mensagem automaticamente após 6 segundos
+    setTimeout(removerMensagem, 6000);
 </script>
 
 @endsection

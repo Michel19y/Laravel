@@ -46,7 +46,7 @@
 
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                            <a href="{{ route('home') }}" class="btn btn-secondary">Voltar</a>
+                            <a href="{{ route('userinfo.index') }}" class="btn btn-secondary">Voltar</a>
                         </div>
                     </form>
                 </div>

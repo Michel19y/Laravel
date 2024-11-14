@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Endereco;
 use App\Models\Pedido;
 use App\Models\PedidoProduto;
+// use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
   
     
 class PedidosController extends Controller
@@ -24,6 +26,10 @@ class PedidosController extends Controller
         if (!Auth::guard('admin')->check() && !Auth::check()) {
             return redirect()->route('home')->with('error', 'Você precisa estar logado para ver seus pedidos.');
         }
+
+        // Pega a message enviada por redirect with
+        $message = Session::get("success");
+        $erro = Session::get("error");
     
         // Verifica se o usuário está autenticado como admin
         $isAdmin = Auth::guard('admin')->check();
@@ -122,8 +128,9 @@ class PedidosController extends Controller
         return view('pedidos.index', [
             'pedidos' => $pedidos, 
             'dataInicio' => $request->input('data_inicio'), // Envia de volta o formato dd/mm/yyyy
-            'dataFim' => $request->input('data_fim') // Envia de volta o formato dd/mm/yyyy
-        ]);
+            'dataFim' => $request->input('data_fim'), // Envia de volta o formato dd/mm/yyyy
+            'message' => $message,
+            'error'   => $erro       ]);
     }
     
 
@@ -195,7 +202,6 @@ class PedidosController extends Controller
         } catch (\Exception $e) {
             // Em caso de erro, desfaz a transação e retorna com mensagem de erro
             DB::rollBack();
-            dd($e);
             return redirect()->route('pedidos.index')->with('error', 'Falha ao gerar o pedido: ' . $e->getMessage());
         }
     }
@@ -265,6 +271,8 @@ class PedidosController extends Controller
         
         try {
             $pedido = Pedido::find($id);
+
+      
             
             if (!$pedido) {
                 throw new \Exception('Pedido não encontrado.');
@@ -277,12 +285,12 @@ class PedidosController extends Controller
             
             DB::commit();
             
-            return redirect()->route("pedidos.index")->with('success', 'Pedido excluído com sucesso.');
+            return redirect()->back()->with('success', 'Pedido Removido com sucesso!');
         } catch (\Throwable $th) {
             DB::rollBack();
             Log::error('Erro ao excluir o pedido: ' . $th->getMessage());
             
-            return redirect()->route("pedidoes.index")->with('error', 'Ocorreu um erro ao tentar excluir o pedido.');
+            return redirect()->route("pedidos.index")->with('error', 'Ocorreu um erro ao tentar excluir o pedido.');
         }
     }
     

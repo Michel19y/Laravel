@@ -16,6 +16,7 @@ class EnderecoController extends Controller
      */
     public function index()
     {
+        
         try {
             $id = Auth::id(); // Obtém o ID do usuário autenticado de forma simplificada
             $message = Session::get("message"); // Obtém a mensagem da sessão, se existir

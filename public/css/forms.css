@@ -89,11 +89,7 @@ label {
     background-color: #000000;
     color: #ffc107;
 }
-.btn-secondary {
-    background-color: transparent;
-    color: #ffc107;
-    border: 1px solid #ffc107;
-}
+
 .btn-secondary:hover {
     background-color: #ffc107;
     color: black;

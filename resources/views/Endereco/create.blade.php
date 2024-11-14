@@ -41,9 +41,9 @@
                 <label for="id-input-complemento" class="form-label">Complemento</label>
                 <input type="text" class="form-control" id="id-input-complemento" name="complemento" placeholder="Digite a complemento">
             </div>
-            <div class="mb-3">
+            <div class="mb-3">  <a href="{{url()->previous()}}" class="btn btn-primary">Voltar</a>
                 <button type="submit" class="btn btn-primary">Enviar</button>
-                <a href="{{url()->previous()}}" class="btn btn-primary">Voltar</a>
+              
             </div>
         </form>
     </div>
