@@ -10,6 +10,10 @@
 
     <title>Caronte</title>
     <link rel="icon" type="image" href="/img/p.png">
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <!-- Google Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">

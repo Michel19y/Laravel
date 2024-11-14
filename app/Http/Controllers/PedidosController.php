@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+    use Carbon\Carbon;
 use App\Models\Endereco;
 use App\Models\Pedido;
 use App\Models\PedidoProduto;
@@ -9,12 +9,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Support\Facades\DB;
-  use Illuminate\Support\Collection;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+  
     
 class PedidosController extends Controller
 {
    
-    public function index()
+
+ 
+    public function index(Request $request)
     {
         // Verifica se o usuário está autenticado no guard de admin ou de usuário
         if (!Auth::guard('admin')->check() && !Auth::check()) {
@@ -24,16 +28,19 @@ class PedidosController extends Controller
         // Verifica se o usuário está autenticado como admin
         $isAdmin = Auth::guard('admin')->check();
     
-        // Obtém o ID do usuário autenticado (se for admin, usa o guard admin; se não, usa o usuário comum)
+        // Obtém o ID do usuário autenticado
         $userId = $isAdmin ? Auth::guard('admin')->user()->id : Auth::user()->id;
     
-        // Define a consulta SQL com base no tipo de usuário
-        $pedidos = [];
+        // Captura as datas de início e fim dos filtros e converte para o formato yyyy-mm-dd
+        $dataInicio = $request->input('data_inicio') 
+            ? Carbon::createFromFormat('d/m/Y', $request->input('data_inicio'))->format('Y-m-d') 
+            : null;
+        $dataFim = $request->input('data_fim') 
+            ? Carbon::createFromFormat('d/m/Y', $request->input('data_fim'))->format('Y-m-d') 
+            : null;
     
-        if ($isAdmin) {
-            // Se o usuário é admin, busca todos os pedidos
-            $pedidos = DB::select("
-                SELECT 
+        // Define a consulta SQL com base no tipo de usuário
+        $query = "SELECT 
                     pedidos.id,
                     pedidos.status,
                     pedidos.created_at,
@@ -50,51 +57,45 @@ class PedidosController extends Controller
                 JOIN pedido_produtos ON pedidos.id = pedido_produtos.Pedidos_id
                 JOIN produtos ON pedido_produtos.Produtos_id = produtos.id
                 LEFT JOIN enderecos ON pedidos.Enderecos_id = enderecos.id
-                JOIN users ON pedidos.Users_id = users.id
-                GROUP BY 
-                    pedidos.id, 
-                    pedidos.status, 
-                    pedidos.created_at, 
-                    enderecos.logradouro, 
-                    enderecos.bairro, 
-                    enderecos.numero, 
-                    users.name
-                ORDER BY pedidos.id
-            ");
-        } 
-        else {
-            // Caso contrário, busca apenas os pedidos do usuário autenticado
-            $pedidos = DB::select("
-                SELECT 
-                    pedidos.id,
-                    pedidos.status,
-                    pedidos.created_at,
-                    GROUP_CONCAT(pedido_produtos.quantidade SEPARATOR ', ') AS quantidade_total,
-                    GROUP_CONCAT(produtos.nome SEPARATOR ', ') AS produtos_nome,
-                    GROUP_CONCAT(produtos.preco SEPARATOR ', ') AS produtos_preco,
-                    GROUP_CONCAT(pedido_produtos.observacao SEPARATOR ', ') AS observacoes,
-                    SUM(pedido_produtos.quantidade * produtos.preco) AS total_preco,
-                    enderecos.logradouro,
-                    enderecos.bairro,
-                    enderecos.numero,
-                    users.name AS cliente_nome
-                FROM pedidos
-                JOIN pedido_produtos ON pedidos.id = pedido_produtos.Pedidos_id
-                JOIN produtos ON pedido_produtos.Produtos_id = produtos.id
-                LEFT JOIN enderecos ON pedidos.Enderecos_id = enderecos.id
-                JOIN users ON pedidos.Users_id = users.id
-                WHERE pedidos.Users_id = ?
-                GROUP BY 
-                    pedidos.id, 
-                    pedidos.status, 
-                    pedidos.created_at, 
-                    enderecos.logradouro, 
-                    enderecos.bairro, 
-                    enderecos.numero, 
-                    users.name
-                ORDER BY pedidos.id
-            ", [$userId]);
+                JOIN users ON pedidos.Users_id = users.id ";
+    
+        // Define os parâmetros e as condições para o tipo de usuário e filtro de datas
+        $params = [];
+        $conditions = [];
+    
+        if (!$isAdmin) {
+            $conditions[] = "pedidos.Users_id = ?";
+            $params[] = $userId;
         }
+    
+        if ($dataInicio && $dataFim) {
+            $conditions[] = "pedidos.created_at BETWEEN ? AND ?";
+            $params[] = $dataInicio . ' 00:00:00';
+            $params[] = $dataFim . ' 23:59:59';
+        } elseif ($dataInicio) {
+            $conditions[] = "pedidos.created_at >= ?";
+            $params[] = $dataInicio . ' 00:00:00';
+        } elseif ($dataFim) {
+            $conditions[] = "pedidos.created_at <= ?";
+            $params[] = $dataFim . ' 23:59:59';
+        }
+    
+        if (count($conditions) > 0) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+        }
+    
+        $query .= " GROUP BY 
+                        pedidos.id, 
+                        pedidos.status, 
+                        pedidos.created_at, 
+                        enderecos.logradouro, 
+                        enderecos.bairro, 
+                        enderecos.numero, 
+                        users.name
+                    ORDER BY pedidos.id";
+    
+        // Executa a consulta com os parâmetros definidos
+        $pedidos = DB::select($query, $params);
     
         // Processa os pedidos para formatar os dados dos produtos como arrays
         $pedidos = collect($pedidos)->map(function ($pedido) {
@@ -117,16 +118,14 @@ class PedidosController extends Controller
             return $pedido;
         });
     
-        // Retorna a view com os pedidos
-        return view('pedidos.index', ['pedidos' => $pedidos]);
+        // Retorna a view com os pedidos e filtros de data
+        return view('pedidos.index', [
+            'pedidos' => $pedidos, 
+            'dataInicio' => $request->input('data_inicio'), // Envia de volta o formato dd/mm/yyyy
+            'dataFim' => $request->input('data_fim') // Envia de volta o formato dd/mm/yyyy
+        ]);
     }
     
-
-
-
-
-
-
 
 
 
@@ -259,21 +258,34 @@ class PedidosController extends Controller
         }
     }
 
+  
     public function destroy(string $id)
     {
-    DB::beginTransaction(); // Inicia a transação
-    try {
-    $pedido = Pedido::find($id);
-    if (isset($pedido)) {
-    $pedido->delete();
-   
+        DB::beginTransaction();
+        
+        try {
+            $pedido = Pedido::find($id);
+            
+            if (!$pedido) {
+                throw new \Exception('Pedido não encontrado.');
+            }
+            // dd($pedido);
+
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            $pedido->delete();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            
+            DB::commit();
+            
+            return redirect()->route("pedidos.index")->with('success', 'Pedido excluído com sucesso.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error('Erro ao excluir o pedido: ' . $th->getMessage());
+            
+            return redirect()->route("pedidoes.index")->with('error', 'Ocorreu um erro ao tentar excluir o pedido.');
+        }
     }
-    DB::commit(); // Confirma a transação
-    return redirect()->route("pedidos.index");
-    } catch (\Throwable $th) {
-    DB::rollBack(); // Desfaz a transação em caso de erro
-    dd($th);
-    return redirect()->route("pedidos.index");
-    }
-    }
+    
+    
+    
 }

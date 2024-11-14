@@ -27,13 +27,3 @@ public function endereco()
 }
 
 }
-
-
-
-
-
-
-
-
-
-

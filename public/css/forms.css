@@ -62,6 +62,7 @@ transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
         color: antiquewhite;
     }
 }
+
 .text-muted {
     --bs-text-opacity: 1;
     color: rgb(255 255 255 / 75%) !important;
