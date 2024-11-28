@@ -16,15 +16,22 @@ class TipoProdutoController extends Controller
      */
     public function index()
     {
-        // Vai no banco de dados e busca todos os dados da tabela Tipo_Produtos
-        // Esses dados são salvos na variável $tipoProdutos
-        // $tipoProdutos = TipoProduto::all();
-        $tipoProdutos = DB::select('SELECT * FROM Tipo_Produtos');
-        // Mando carregar a view index de TipoProduto com a variável $tipoProdutos
-        // No comando with o primeiro argumento é o nome da variável que será criada
-        // dentro da view. O segundo é os dados que ela irá conter.
-        return view("tipoproduto.index")->with("tipoProdutos", $tipoProdutos);
+        try {
+            // Realiza a consulta para buscar todos os dados da tabela Tipo_Produtos
+            $tipoProdutos = DB::select('SELECT * FROM Tipo_Produtos');
+    
+            // Retorna a view com os dados obtidos
+            return view("tipoproduto.index")
+                ->with("tipoProdutos", $tipoProdutos)
+                ->with("message", ["Operação realizada com sucesso!", "success"]); // Mensagem de sucesso
+        } catch (\Throwable $th) {
+            // Trata erros e retorna uma mensagem apropriada
+            return view("tipoproduto.index")
+                ->with("tipoProdutos", []) // Retorna uma lista vazia caso ocorra erro
+                ->with("message", [$th->getMessage(), "danger"]); // Mensagem de erro
+        }
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -46,19 +53,31 @@ class TipoProdutoController extends Controller
      */
     public function store(Request $request)
     {
-
-
-        
-                $tipoProduto = new TipoProduto();
-                $tipoProduto->descricao = $request->descricao;
-                $tipoProduto->save();
-                return redirect()->route('tipoproduto.index');
-   
-        
-        
-        
-        //return view("tipoproduto.store");
+        // Inicia uma transação
+        DB::beginTransaction();
+    
+        try {
+            // Cria uma nova instância do modelo TipoProduto
+            $tipoProduto = new TipoProduto();
+            $tipoProduto->descricao = $request->descricao; // Define o valor da descrição
+            $tipoProduto->save(); // Salva o registro no banco de dados
+    
+            // Confirma a transação se tudo der certo
+            DB::commit();
+    
+            // Redireciona para a lista com uma mensagem de sucesso
+            return redirect()->route('tipoproduto.index')
+                ->with("message", ["Tipo de produto criado com sucesso!", "success"]);
+        } catch (\Throwable $th) {
+            // Desfaz a transação em caso de erro
+            DB::rollback();
+    
+            // Redireciona para a página inicial com uma mensagem de erro
+            return redirect()->route('tipoproduto.index')
+                ->with("message", ["Erro ao criar tipo de produto: " . $th->getMessage(), "danger"]);
+        }
     }
+      
 
     /**
      * Display the specified resource.

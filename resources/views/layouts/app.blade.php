@@ -30,7 +30,7 @@
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name') }}
-                </a>  
+                </a>  <img src="img/p.png">
                 @auth
                 Aqui vc ta on
               

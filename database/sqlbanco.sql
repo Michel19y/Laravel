@@ -20,8 +20,10 @@ USE `RestauranteDB` ;
 
 -- -----------------------------------------------------
 -- Table `RestauranteDB`.`Password_Resets`
+
+
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `RestauranteDB`.`Password_Resets` (
+CREATE TABLE IF NOT EXISTS `RestauranteDB`.`password_reset_tokens` (
   `token` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
   `updated_at` TIMESTAMP NULL,
@@ -47,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `RestauranteDB`.`Users` (
   INDEX `fk_Users_Password_Resets1_idx` (`remember_token` ASC),
   CONSTRAINT `fk_Users_Password_Resets1`
     FOREIGN KEY (`remember_token`)
-    REFERENCES `RestauranteDB`.`Password_Resets` (`token`)
+    REFERENCES `RestauranteDB`.`password_reset_tokens` (`token`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
